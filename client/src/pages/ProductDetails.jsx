@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../store/CartSlice";
+import toast from 'react-hot-toast';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -30,6 +31,7 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     dispatch(addToCart({ ...product, quantity: 1 }));
+    toast.success(`${product.name} added to cart`);
   };
 
   if (loading) {
