@@ -1,107 +1,107 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
 
-const ProductEditPage = () => {
-  const { id } = useParams(); // "new" or existing product id
+const ProductFormPage = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const isNew = id === 'new';
+  const isEdit = Boolean(id);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    image: '',
-    brand: '',
-    category: '',
-    description: '',
-    price: '',
-    countInStock: '',
+  const [form, setForm] = useState({
+    name: "",
+    brand: "",
+    category: "",
+    description: "",
+    image: "",
+    price: 0,
+    countInStock: 0,
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  // Fetch product if editing
+  // Load existing product if in edit mode
   useEffect(() => {
-    const fetchProduct = async () => {
-      if (!isNew) {
+    if (isEdit) {
+      const fetchProduct = async () => {
+        setLoading(true);
         try {
-          const { data } = await axios.get(`/api/products/${id}`);
-          setFormData({
-            name: data.name,
-            image: data.image,
-            brand: data.brand,
-            category: data.category,
-            description: data.description,
-            price: data.price,
-            countInStock: data.countInStock,
+          const { data } = await axios.get(`http://localhost:5000/api/products/${id}`);
+          setForm({
+            name: data.name || "",
+            brand: data.brand || "",
+            category: data.category || "",
+            description: data.description || "",
+            image: data.image || "",
+            price: data.price || 0,
+            countInStock: data.countInStock || 0,
           });
-        } catch  {
-          setError('Failed to load product');
+        } catch {
+          setError("Product not found");
+        } finally {
+          setLoading(false);
         }
-      }
-    };
-    fetchProduct();
-  }, [id, isNew]);
+      };
+      fetchProduct();
+    }
+  }, [id, isEdit]);
 
-  // Handle form input
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
   };
 
-  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
-      if (isNew) {
-        await axios.post('/api/products', formData);
-        toast.success('Product created');
+      if (isEdit) {
+        await axios.put(`http://localhost:5000/api/products/${id}`, form);
+        toast.success("Product updated successfully");
       } else {
-        await axios.put(`/api/products/${id}`, formData);
-        toast.success('Product updated');
+        await axios.post("http://localhost:5000/api/products", form);
+        toast.success("Product created successfully");
       }
-      navigate('/admin/products');
-    } catch  {
-      toast.error('Error saving product');
-    } finally {
-      setLoading(false);
+      navigate("/admin/products");
+    } catch {
+      toast.error("Something went wrong");
     }
   };
 
+  if (loading) return <div className="text-center mt-10">Loading...</div>;
+  if (error) return <div className="text-center text-red-500 mt-10">{error}</div>;
+
   return (
-    <div className="max-w-3xl mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6">
-        {isNew ? 'Create Product' : 'Edit Product'}
+    <div className="max-w-3xl mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-4">
+        {isEdit ? "Edit Product" : "Create Product"}
       </h1>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
       <form onSubmit={handleSubmit} className="space-y-4">
-        {['name', 'brand', 'category', 'description', 'image', 'price', 'countInStock'].map((field) => (
-          <div key={field}>
-            <label className="block text-sm font-medium text-gray-700 capitalize">{field}</label>
-            <input
-              type={field === 'price' || field === 'countInStock' ? 'number' : 'text'}
-              name={field}
-              value={formData[field]}
-              onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
-              required
-            />
-          </div>
-        ))}
+        {["name", "brand", "category", "description", "image", "price", "countInStock"].map(
+          (field) => (
+            <div key={field}>
+              <label className="block mb-1 capitalize">{field}</label>
+              <input
+                type={field === "price" || field === "countInStock" ? "number" : "text"}
+                name={field}
+                value={form[field]}
+                onChange={handleChange}
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+          )
+        )}
 
         <button
           type="submit"
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md disabled:opacity-50"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
         >
-          {loading ? 'Saving...' : isNew ? 'Create' : 'Update'}
+          {isEdit ? "Update" : "Create"} Product
         </button>
       </form>
     </div>
   );
 };
 
-export default ProductEditPage;
+export default ProductFormPage;
