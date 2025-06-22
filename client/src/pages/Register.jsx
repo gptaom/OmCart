@@ -1,15 +1,34 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../store/authSlice';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Register submitted:', { name, email, password });
-    // We'll replace this with real API later
+
+    try {
+      const { data } = await axios.post('http://localhost:5000/api/users/register', {
+        name,
+        email,
+        password,
+      });
+
+      dispatch(setCredentials(data));
+      toast.success('Registered and logged in!');
+      navigate('/');
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Registration failed');
+    }
   };
 
   return (

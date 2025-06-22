@@ -1,14 +1,34 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../store/authSlice';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login submitted:', { email, password });
-    // We'll replace this with real API later
+
+    try {
+      const { data } = await axios.post('http://localhost:5000/api/users/login', {
+        email,
+        password,
+      });
+
+      dispatch(setCredentials(data));
+      toast.success('Logged in successfully!');
+      navigate('/');
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message || 'Invalid credentials'
+      );
+    }
   };
 
   return (
@@ -47,7 +67,7 @@ const Login = () => {
         </form>
 
         <p className="text-sm text-center text-gray-600 mt-4">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link to="/register" className="text-blue-600 hover:underline">
             Register
           </Link>
