@@ -1,35 +1,25 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import productRoutes from './routes/productRoutes.js';
+
+dotenv.config();
+
 const app = express();
-const port = 5000;
+app.use(express.json());
 
-app.use(cors());
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.log(err));
 
-const products = [
-  {
-    id: 1,
-    name: "iPhone 14 Pro",
-    price: 1299,
-    image: "https://via.placeholder.com/150"
-  },
-  {
-    id: 2,
-    name: "Samsung Galaxy S23",
-    price: 1099,
-    image: "https://via.placeholder.com/150"
-  },
-  {
-    id: 3,
-    name: "MacBook Air M2",
-    price: 1899,
-    image: "https://via.placeholder.com/150"
-  }
-];
-
-app.get('/api/products', (req, res) => {
-  res.json(products);
+// Test route
+app.get('/', (req, res) => {
+  res.send('API is running...');
 });
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+// Mount the product routes
+app.use('/api/products', productRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
