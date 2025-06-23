@@ -1,144 +1,90 @@
-// src/components/Navbar.jsx
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingCart, User, Search } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../store/authSlice";
+import { ShoppingCart, ChevronDown } from "lucide-react";
 
 const Navbar = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
   const { userInfo } = useSelector((state) => state.auth);
-  const cartItems = useSelector((state) => state.cart.items); 
-  const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const cartItems = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/");
+    navigate("/login");
   };
 
-  const navItems = [
-    { name: "Home", to: "/" },
-    { name: "Products", to: "/products" },
-    { name: "Blog", to: "/blog" },
-    { name: "Contact", to: "/contact" },
-  ];
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <header className="bg-white shadow sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-gray-800">
-          OmCart
+    <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+      <Link to="/" className="text-xl font-bold text-blue-600">OmCart</Link>
+
+      <div className="flex items-center gap-4">
+        <Link to="/products" className="hover:text-blue-600 font-medium">Products</Link>
+
+        <Link to="/cart" className="relative">
+          <ShoppingCart />
+          {cartItems.length > 0 && (
+            <span className="absolute -top-2 -right-2 text-xs bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+              {cartItems.length}
+            </span>
+          )}
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center space-x-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="text-gray-700 hover:text-blue-600 font-medium"
+        {userInfo ? (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen((prev) => !prev)}
+              className="flex items-center gap-1 font-medium hover:text-blue-600"
             >
-              {item.name}
-            </Link>
-          ))}
-
-          {userInfo?.isAdmin && (
-            <Link to="/admin/products" className="text-red-600 font-semibold">
-              Admin
-            </Link>
-          )}
-
-          {userInfo ? (
-            <>
-              <Link to="/account" className="hover:text-blue-600">
-                Hi, {userInfo.name.split(" ")[0]}
-              </Link>
-              <button onClick={handleLogout} className="text-sm text-red-600">
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link to="/login" className="hover:text-blue-600">Login</Link>
-          )}
-
-          
-          <Link to="/cart" className="relative">
-         <ShoppingCart className="w-5 h-5" />
-        {totalCount > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5">
-            {totalCount}
-          </span>
+              Hi, {userInfo.name} <ChevronDown size={18} />
+            </button>
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-md z-50">
+                <Link
+                  to="/account"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  My Account
+                </Link>
+                <Link
+                  to="/my-orders"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  My Orders
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <Link to="/login" className="hover:text-blue-600 font-medium">Login</Link>
+            <Link to="/register" className="hover:text-blue-600 font-medium">Register</Link>
+          </>
         )}
-      </Link>
-        </nav>
-
-        {/* Mobile Toggle */}
-        <button
-          className="md:hidden focus:outline-none hover:text-blue-600"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
       </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden px-4 pb-4 space-y-2 bg-white">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="block text-gray-700 hover:text-blue-600 font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {item.name}
-            </Link>
-          ))}
-
-          {userInfo?.isAdmin && (
-            <Link
-              to="/admin/products"
-              className="block text-red-600 font-semibold"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Admin
-            </Link>
-          )}
-
-          {userInfo ? (
-            <>
-              <Link
-                to="/account"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-gray-700 hover:text-blue-600"
-              >
-                Account
-              </Link>
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setMobileMenuOpen(false);
-                }}
-                className="block text-left w-full text-red-600"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link
-              to="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-gray-700 hover:text-blue-600"
-            >
-              Login
-            </Link>
-          )}
-        </div>
-      )}
-    </header>
+    </nav>
   );
 };
 

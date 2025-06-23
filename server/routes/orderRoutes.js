@@ -36,4 +36,34 @@ router.post('/', protect, async (req, res) => {
   }
 });
 
+router.get('/myorders', protect, async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user._id });
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch user orders' });
+  }
+});
+
+router.get('/:id', protect, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate('user', 'name email');
+
+    if (order) {
+      // Only allow owner of order (or admin)
+      if (order.user._id.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+        return res.status(401).json({ message: 'Not authorized to view this order' });
+      }
+
+      res.json(order);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 export default router;

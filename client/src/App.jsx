@@ -14,6 +14,7 @@ import ShippingPage from './pages/ShippingPage';
 import PaymentPage from './pages/PaymentPage';
 import PlaceOrderPage from './pages/PlaceOrderPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import MyOrdersPage from './pages/MyOrdersPage';
 
 import AdminRoute from './components/AdminRoute';
 import PrivateRoute from './components/PrivateRoute'; // ✅ Import your new private route
@@ -43,6 +44,9 @@ const App = () => {
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/placeorder" element={<PlaceOrderPage />} />
           <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+          <Route path="/my-orders" element={<MyOrdersPage />} />
+          <Route path="/order/:id" element={<OrderConfirmationPage />} />
+
         </Route>
       </Routes>
     </div>
