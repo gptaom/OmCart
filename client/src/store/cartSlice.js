@@ -1,8 +1,9 @@
-// store/cartSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  items: [],          // <- renamed
+  items: [],
+  shippingAddress: {},
+  paymentMethod: '',           // ✅ add default
 };
 
 const cartSlice = createSlice({
@@ -11,10 +12,9 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const item = action.payload;
-      const existing = state.items.find((x) => x._id === item._id);
-
-      if (existing) {
-        existing.quantity += item.quantity;
+      const exist = state.items.find((x) => x._id === item._id);
+      if (exist) {
+        exist.quantity += item.quantity;
       } else {
         state.items.push(item);
       }
@@ -24,11 +24,33 @@ const cartSlice = createSlice({
     },
     updateQuantity: (state, action) => {
       const { id, quantity } = action.payload;
-      const found = state.items.find((x) => x._id === id);
-      if (found) found.quantity = quantity;
+      const prod = state.items.find((x) => x._id === id);
+      if (prod) prod.quantity = quantity;
+    },
+    saveShippingAddress: (state, action) => {
+      state.shippingAddress = action.payload;
+    },
+
+    // ✅ use ONLY ONE payment-method reducer
+    setPaymentMethod: (state, action) => {
+      state.paymentMethod = action.payload;
+    },
+
+    clearCart: (state) => {
+      state.items = [];
+      state.shippingAddress = {};
+      state.paymentMethod = '';
     },
   },
 });
 
-export const { addToCart, removeFromCart, updateQuantity } = cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  updateQuantity,
+  saveShippingAddress,
+  setPaymentMethod,   // ✅ export the single reducer
+  clearCart,
+} = cartSlice.actions;
+
 export default cartSlice.reducer;

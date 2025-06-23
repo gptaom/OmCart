@@ -10,22 +10,40 @@ import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProductList from "./pages/admin/AdminProductList";
 import ProductEditPage from './pages/admin/ProductEditPage';
+import ShippingPage from './pages/ShippingPage';
+import PaymentPage from './pages/PaymentPage';
+import PlaceOrderPage from './pages/PlaceOrderPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
+
+import AdminRoute from './components/AdminRoute';
+import PrivateRoute from './components/PrivateRoute'; // ✅ Import your new private route
 
 const App = () => {
   return (
     <div className="bg-gray-50 min-h-screen text-gray-800">
       <Navbar />
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminProductList />} />
-        <Route path="/admin/products/:id/edit" element={<ProductEditPage />} />
-<Route path="/admin/products/new" element={<ProductEditPage />} />
+
+        {/* Admin Protected Routes */}
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/products" element={<AdminRoute><AdminProductList /></AdminRoute>} />
+        <Route path="/admin/products/:id/edit" element={<AdminRoute><ProductEditPage /></AdminRoute>} />
+        <Route path="/admin/products/new" element={<AdminRoute><ProductEditPage /></AdminRoute>} />
+
+        {/* User Protected Routes using PrivateRoute wrapper */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/shipping" element={<ShippingPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/placeorder" element={<PlaceOrderPage />} />
+          <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+        </Route>
       </Routes>
     </div>
   );
