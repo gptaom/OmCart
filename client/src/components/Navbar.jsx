@@ -68,6 +68,9 @@ const Navbar = () => {
                 >
                   My Orders
                 </Link>
+                {userInfo.isAdmin && (
+        <a href="/admin" className="block px-4 py-2 hover:bg-gray-100">Admin Panel</a>
+      )}
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"

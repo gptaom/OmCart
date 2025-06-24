@@ -15,6 +15,9 @@ import PaymentPage from './pages/PaymentPage';
 import PlaceOrderPage from './pages/PlaceOrderPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import MyOrdersPage from './pages/MyOrdersPage';
+import AdminOrderList from './pages/admin/AdminOrderList';
+import AdminUserList from './pages/admin/AdminUserList';
+
 
 import AdminRoute from './components/AdminRoute';
 import PrivateRoute from './components/PrivateRoute'; // ✅ Import your new private route
@@ -37,6 +40,8 @@ const App = () => {
         <Route path="/admin/products" element={<AdminRoute><AdminProductList /></AdminRoute>} />
         <Route path="/admin/products/:id/edit" element={<AdminRoute><ProductEditPage /></AdminRoute>} />
         <Route path="/admin/products/new" element={<AdminRoute><ProductEditPage /></AdminRoute>} />
+        <Route path="/admin/orders" element={<AdminRoute><AdminOrderList /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><AdminUserList /></AdminRoute>}/>
 
         {/* User Protected Routes using PrivateRoute wrapper */}
         <Route element={<PrivateRoute />}>

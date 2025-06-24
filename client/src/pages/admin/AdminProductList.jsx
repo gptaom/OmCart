@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import axios from '../../axios';
+import { useSelector } from 'react-redux';
 
 const AdminProductList = () => {
   const [products, setProducts] = useState([]);
 
-  const getProducts = async () => {
-    try {
-      const { data } = await axios.get('http://localhost:5000/api/products');
+  const { userInfo } = useSelector((state) => state.auth);
 
-
-      setProducts(data);
-    } catch {
-      toast.error('Failed to fetch products');
-    }
-  };
-
+const getProducts = async () => {
+  try {
+    const config = {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    };
+    const { data } = await axios.get('/api/products', config);
+    setProducts(data);
+  } catch {
+    toast.error('Failed to fetch products');
+  }
+};
   const deleteProduct = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/products/${id}`);

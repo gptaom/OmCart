@@ -1,4 +1,4 @@
-import User from '../models/User.js';
+import User from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 
 // Generate JWT
@@ -46,3 +46,35 @@ export const loginUser = async (req, res) => {
     res.status(401).json({ message: 'Invalid email or password' });
   }
 };
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+// @desc    Delete user by ID
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+    if (deletedUser) {
+      res.json({ message: 'User removed' });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Delete user error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+export { getUsers, deleteUser };

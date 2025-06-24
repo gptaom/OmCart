@@ -1,5 +1,5 @@
 import express from 'express';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 import Order from '../models/orderModel.js';
 
 const router = express.Router();
@@ -63,6 +63,32 @@ router.get('/:id', protect, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @desc    Get all orders
+// @route   GET /api/orders
+// @access  Private/Admin
+router.get('/', protect, admin, async (req, res) => {
+  try {
+    const orders = await Order.find({}).populate('user', 'name email');
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+});
+
+// @desc    Get all orders (admin only)
+// @route   GET /api/orders
+// @access  Private/Admin
+router.get('/', protect, admin, async (req, res) => {
+  try {
+    const orders = await Order.find({}).populate('user', 'name email');
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch orders' });
   }
 });
 
