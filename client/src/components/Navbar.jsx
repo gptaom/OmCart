@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../store/authSlice";
 import { ShoppingCart, ChevronDown } from "lucide-react";
+import { fetchWishlist } from '../store/wishlistSlice'; 
 
 const Navbar = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -19,6 +20,9 @@ const Navbar = () => {
   };
 
   useEffect(() => {
+    if (userInfo) {
+    dispatch(fetchWishlist());
+  }
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
@@ -61,6 +65,9 @@ const Navbar = () => {
                 >
                   My Account
                 </Link>
+                <Link to="/wishlist"className="block px-4 py-2 hover:bg-gray-100"
+                onClick={() => setDropdownOpen(false)}>My Wishlist</Link>
+
                 <Link
                   to="/my-orders"
                   className="block px-4 py-2 hover:bg-gray-100"

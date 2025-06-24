@@ -1,30 +1,40 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import ProductCard from "../components/productCard";
+import axios from "../axios"; // ✅ use your configured axios instance
+import ProductCard from "../components/ProductCard";
+import { useSelector } from "react-redux";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/products");
+        const productsRes = await axios.get("/api/products");
+        setProducts(productsRes.data);
 
-        console.log("Products API response:", data);
+        if (userInfo) {
+          const wishlistRes = await axios.get("/api/wishlist", {
+            headers: {
+              Authorization: `Bearer ${userInfo.token}`,
+            },
+          });
+          setWishlist(wishlistRes.data.map((item) => item._id));
+        }
 
-        setProducts(data);
         setLoading(false);
       } catch (err) {
-        console.error(err);
+        console.error("Error loading data:", err);
         setError("Failed to load products.");
         setLoading(false);
       }
     };
 
-    fetchProducts();
-  }, []);
+    fetchData();
+  }, [userInfo]);
 
   if (loading) return <div className="text-center mt-10">Loading products...</div>;
   if (error) return <div className="text-center text-red-500 mt-10">{error}</div>;
@@ -32,13 +42,16 @@ const Products = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">All Products</h1>
-      // ...existing code...
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-  {Array.isArray(products) && products.map((product) => (
-    <ProductCard key={product._id} product={product} />
-  ))}
-</div>
-// ...existing code...
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((product) => (
+          <ProductCard
+            key={product._id}
+            product={product}
+            wishlisted={wishlist.includes(product._id)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

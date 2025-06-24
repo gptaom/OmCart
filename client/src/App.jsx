@@ -17,6 +17,7 @@ import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import AdminOrderList from './pages/admin/AdminOrderList';
 import AdminUserList from './pages/admin/AdminUserList';
+import WishlistPage from './pages/WishlistPage';
 
 
 import AdminRoute from './components/AdminRoute';
@@ -51,6 +52,8 @@ const App = () => {
           <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="/my-orders" element={<MyOrdersPage />} />
           <Route path="/order/:id" element={<OrderConfirmationPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+
 
         </Route>
       </Routes>

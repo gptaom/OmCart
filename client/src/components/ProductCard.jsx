@@ -1,16 +1,36 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleWishlist } from "../store/wishlistSlice";
+import { Heart, HeartOff } from "lucide-react";
 
 const ProductCard = ({ product }) => {
+  const dispatch = useDispatch();
+  const wishlistItems = useSelector((state) => state.wishlist.items);
+  const isWishlisted = wishlistItems.some(item => item._id === product._id);
+
+  const handleWishlistToggle = () => {
+    dispatch(toggleWishlist(product._id));
+  };
+
   return (
-    <Link to={`/products/${product._id}`}>
-      <div className="border rounded p-4 shadow hover:shadow-lg transition duration-300 cursor-pointer">
-        <img src={product.image} alt={product.name} className="w-full h-40 object-cover mb-4" />
-        <h2 className="text-lg font-semibold">{product.name}</h2>
-        <p className="text-gray-500">{product.brand}</p>
-        <p className="text-blue-600 font-bold">${product.price}</p>
-      </div>
-    </Link>
+    <div className="border rounded-lg p-4 relative">
+      {/* Product info */}
+      <img src={product.image} alt={product.name} className="w-full h-40 object-contain" />
+      <h3 className="font-semibold mt-2">{product.name}</h3>
+      <p className="font-bold">${product.price}</p>
+
+      {/* Wishlist icon */}
+      <button
+        onClick={handleWishlistToggle}
+        className="absolute top-2 right-2 text-gray-500"
+      >
+        {isWishlisted ? (
+          <Heart className="text-red-500 fill-red-500" />
+        ) : (
+          <Heart />
+        )}
+      </button>
+    </div>
   );
 };
 

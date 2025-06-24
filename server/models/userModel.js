@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -23,9 +24,16 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    wishlist: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
+  },
+],
   },
   { timestamps: true }
 );
+
 
 // Match passwords
 userSchema.methods.matchPassword = async function (enteredPassword) {

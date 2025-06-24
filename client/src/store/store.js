@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import cartReducer from './CartSlice';
 import authReducer from './authSlice';
+import wishlistReducer from './wishlistSlice';
 
 // ✅ Load cart state from localStorage
 const loadCartFromLocalStorage = () => {
@@ -33,6 +34,7 @@ const store = configureStore({
   reducer: {
     cart: cartReducer,
     auth: authReducer,
+    wishlist: wishlistReducer,
   },
   preloadedState,
 });
